@@ -68,8 +68,8 @@ function createPipe() {
   let minGap = canvas.height * 0.24 - difficulty * 5;
   let maxGap = canvas.height * 0.34 - difficulty * 5;
 
-  minGap = Math.max(minGap, canvas.height * 0.18);
-  maxGap = Math.max(maxGap, canvas.height * 0.24);
+  minGap = Math.max(minGap, canvas.height * 0.23);
+  maxGap = Math.max(maxGap, canvas.height * 0.29);
 
   let gapHeight = random(minGap, maxGap);
   let gapY = random(80, canvas.height - groundHeight - gapHeight - 80);
