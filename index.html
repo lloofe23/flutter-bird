@@ -24,6 +24,8 @@
 <canvas id="gameCanvas"></canvas>
 
 <script>
+let highScore = Number(localStorage.getItem("flappyHighScore")) || 0;
+  
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -65,7 +67,7 @@ function createPipe() {
 
   let difficulty = Math.floor(score / 5);
 
-  let minGap = canvas.height * 0.24 - difficulty * 5;
+  let minGap = canvas.height * 0.30 - difficulty * 5;
   let maxGap = canvas.height * 0.34 - difficulty * 5;
 
   minGap = Math.max(minGap, canvas.height * 0.23);
@@ -172,15 +174,18 @@ function drawPipe(x, y, width, height, isTop) {
 
 function drawScore() {
   ctx.fillStyle = "white";
-  ctx.fillRect(12, 12, 135, 42);
+  ctx.fillRect(12, 12, 190, 70);
 
   ctx.strokeStyle = "black";
   ctx.lineWidth = 2;
-  ctx.strokeRect(12, 12, 135, 42);
+  ctx.strokeRect(12, 12, 190, 70);
 
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
   ctx.fillText("Score: " + score, 24, 42);
+
+  ctx.font = "18px Arial";
+  ctx.fillText("High Score: " + highScore, 24, 70);
 }
 
 function updateBird() {
@@ -225,7 +230,7 @@ function updatePipes() {
 
 function checkCollision() {
   if (bird.y <= 0 || bird.y + bird.size >= canvas.height - groundHeight) {
-    gameOver = true;
+    endGame();
   }
 
   for (let pipe of pipes) {
@@ -245,7 +250,7 @@ function checkCollision() {
     let hitsBottom = birdBottom > bottomPipeTop;
 
     if (hitsPipeX && (hitsTop || hitsBottom)) {
-      gameOver = true;
+      endGame();
     }
   }
 }
@@ -263,6 +268,15 @@ function drawGameOver() {
   ctx.fillText("Tap to Restart", canvas.width / 2, canvas.height / 2 + 25);
 
   ctx.textAlign = "left";
+}
+
+function endGame() {
+  gameOver = true;
+
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("flappyHighScore", highScore);
+  }
 }
 
 function flap() {
