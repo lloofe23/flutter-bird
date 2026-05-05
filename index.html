@@ -61,23 +61,42 @@ function random(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+let lastGapY = null;
+
 function createPipe() {
   pipeWidth = canvas.width * 0.16;
   groundHeight = canvas.height * 0.12;
 
-  let difficulty = Math.floor(score / 5);
+  let difficulty = Math.floor(score / 8);
 
-  let minGap = canvas.height * 0.30 - difficulty * 5;
-  let maxGap = canvas.height * 0.34 - difficulty * 5;
+  let minGap = canvas.height * 0.28 - difficulty * 3;
+  let maxGap = canvas.height * 0.34 - difficulty * 3;
 
-  minGap = Math.max(minGap, canvas.height * 0.23);
-  maxGap = Math.max(maxGap, canvas.height * 0.29);
+  minGap = Math.max(minGap, canvas.height * 0.24);
+  maxGap = Math.max(maxGap, canvas.height * 0.30);
 
   let gapHeight = random(minGap, maxGap);
-  let gapY = random(80, canvas.height - groundHeight - gapHeight - 80);
 
-  let minSpacing = canvas.width * 0.4;
-  let maxSpacing = canvas.width * 0.7;
+  let minGapY = 90;
+  let maxGapY = canvas.height - groundHeight - gapHeight - 90;
+
+  let gapY;
+
+  if (lastGapY === null) {
+    gapY = random(minGapY, maxGapY);
+  } else {
+    let maxJump = canvas.height * 0.22;
+
+    let low = Math.max(minGapY, lastGapY - maxJump);
+    let high = Math.min(maxGapY, lastGapY + maxJump);
+
+    gapY = random(low, high);
+  }
+
+  lastGapY = gapY;
+
+  let minSpacing = canvas.width * 0.55;
+  let maxSpacing = canvas.width * 0.85;
 
   pipes.push({
     x: canvas.width + random(minSpacing, maxSpacing),
@@ -208,17 +227,31 @@ function updatePipes() {
 
   if (pipes.length > 0 && pipes[0].x + pipeWidth < -50) {
     pipes.shift();
-
+  
     let lastPipe = pipes[pipes.length - 1];
-    let spacing = random(canvas.width * 0.4, canvas.width * 0.7);
-
-    let difficulty = Math.floor(score / 5);
-    let minGap = Math.max(canvas.height * 0.24 - difficulty * 5, canvas.height * 0.18);
-    let maxGap = Math.max(canvas.height * 0.34 - difficulty * 5, canvas.height * 0.24);
-
+    let spacing = random(canvas.width * 0.55, canvas.width * 0.85);
+  
+    let difficulty = Math.floor(score / 8);
+  
+    let minGap = canvas.height * 0.28 - difficulty * 3;
+    let maxGap = canvas.height * 0.34 - difficulty * 3;
+  
+    minGap = Math.max(minGap, canvas.height * 0.24);
+    maxGap = Math.max(maxGap, canvas.height * 0.30);
+  
     let gapHeight = random(minGap, maxGap);
-    let gapY = random(80, canvas.height - groundHeight - gapHeight - 80);
-
+  
+    let minGapY = 90;
+    let maxGapY = canvas.height - groundHeight - gapHeight - 90;
+  
+    let maxJump = canvas.height * 0.22;
+  
+    let low = Math.max(minGapY, lastGapY - maxJump);
+    let high = Math.min(maxGapY, lastGapY + maxJump);
+  
+    let gapY = random(low, high);
+    lastGapY = gapY;
+  
     pipes.push({
       x: lastPipe.x + spacing,
       gapY: gapY,
@@ -294,6 +327,7 @@ function restartGame() {
   score = 0;
   gameOver = false;
   setupPipes();
+  lastGapY = null;
 }
 
 function gameLoop() {
